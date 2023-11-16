@@ -2,11 +2,15 @@ import 'dart:ffi';
 
 import 'package:brew_basterd_app/model/brew_model.dart';
 import 'package:brew_basterd_app/pages/brew_detail.dart';
+import 'package:brew_basterd_app/pages/favourite_page.dart';
+import 'package:brew_basterd_app/service/database_helper.dart';
+import 'package:brew_basterd_app/service/database_service.dart';
 import 'package:brew_basterd_app/service/dio_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:sqflite/sqflite.dart';
 
 void main() {
   runApp(ProviderScope(
@@ -55,10 +59,25 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+
+    DatabaseService().closeDatabaseLayer();
+  }
+
+  @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+            onPressed: () {
+              debugPrint('favouritespage');
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => FavouritePage()));
+            },
+            icon: Icon(Icons.save_alt_outlined)),
         title: const Text('Brew-App'),
       ),
       body: ref.watch(brewResponseProvider).when(data: (brewList) {
@@ -77,7 +96,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                               brewModelList: brewList[index])));
                 },
                 child: Card(
-                  color: Color.fromARGB(255, 224, 214, 239),
+                  color: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(11),
                   ),
@@ -98,18 +117,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                 placeholder: 'assets/images/green_top_view.jpg',
                                 fit: BoxFit.cover,
                                 placeholderFit: BoxFit.cover,
-                                /*fit: BoxFit.cover,
-                                imageUrl: brewList[index].image_url ??
-                                    'assets/images/green_top_view.jpg',
-                                placeholder: (context, url) =>
-                                    LoadingAnimationWidget.flickr(
-                                        leftDotColor: Colors.blue,
-                                        rightDotColor: Colors.green,
-                                        size: 25),
-                                errorWidget: (context, url, error) => Icon(
-                                  Icons.image_not_supported,
-                                  size: 15,
-                                ),*/
+                                
                               ))),
                       Expanded(
                           flex: 3,
@@ -125,12 +133,50 @@ class _HomePageState extends ConsumerState<HomePage> {
                                   style: TextStyle(
                                       fontSize: 18, color: Colors.black),
                                 ),
+                                SizedBox(
+                                  height: 20,
+                                  child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                          elevation: 0,
+                                          backgroundColor: Colors.deepPurple,
+                                          shape: ContinuousRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(22))),
+                                      onPressed: () async {
+                                        debugPrint(
+                                            'clicked on save ${brewList[index].name}');
+                                        SavedModel obj = SavedModel(
+                                            id: brewList[index].id,
+                                            name: brewList[index].name,
+                                            image_url:
+                                                brewList[index].image_url);
+
+                                        final int dbService =
+                                            await DatabaseService()
+                                                .saveFavouriteBrew(obj);
+                                        if (dbService > 0) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(SnackBar(
+                                            content: Text(
+                                                'Saved ${brewList[index].name}'),
+                                            duration: Duration(seconds: 2),
+                                          ));
+                                        } else {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(SnackBar(
+                                            content: Text('Its already saved'),
+                                            duration: Duration(seconds: 2),
+                                          ));
+                                        }
+                                      },
+                                      child: Text('save')),
+                                ),
                                 Text(
                                   'Contributor:${brewList[index].contributed_by}' ??
                                       'No value in API',
                                   style: TextStyle(
                                       color: Color.fromARGB(255, 29, 121, 32),
-                                      fontSize: 14),
+                                      fontSize: 10),
                                 )
                               ],
                             ),

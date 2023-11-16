@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 class BrewModel {
@@ -38,5 +39,28 @@ class BrewModel {
         : List<String>.from(json['food_pairing']!.map((item) => item));
     brewer_tips = json['brewer_tips'];
     contributed_by = json['contributed_by'];
+  }
+}
+
+class SavedModel {
+  String? name;
+  String? image_url;
+  int? id;
+
+  SavedModel({required this.id, required this.name, required this.image_url});
+
+  Map<String, dynamic> toMap() {
+    var map = Map<String, dynamic>();
+
+    map['name'] = this.name;
+    map['id'] = this.id;
+    map['image_url'] = this.image_url;
+    return map;
+  }
+
+  SavedModel.fromMapObject(Map<String, dynamic> map) {
+    this.id = map['id'];
+    this.name = map['name'];
+    this.image_url = map['image_url'];
   }
 }

@@ -4,56 +4,47 @@ import 'package:assignment_jwt_flutter/Database/shared_preferences_flutter.dart'
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'Model/user.dart';
 
 class DioService {
-  //  String URL = 'http://localhost:4000/api/users';
-
-/*
-  static Dio dioInstance = Dio(BaseOptions(
-      baseUrl: 'http://localhost:4000/api/users/',
-      responseType: ResponseType.json));
-      */
-
   static Dio dioInstance = Dio();
 
   static Future<dynamic> registerEndPoint(
       String u_name, String u_email, String u_password) async {
-    Map<String, dynamic> map = {
+    Map<String, dynamic> temp_map = {
       'name': u_name,
       'email': u_email,
       'password': u_password
     };
 
-/*
-    final uri_ = Uri.parse('http://localhost:4000/api/users/');
-
-    http.Response response = await http.post(uri_,
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode(<String, String>{
-          "name": u_name,
-          "email": u_email,
-          "password": u_password
-        }));
-
-    print(response.body);
-
-    if (response.statusCode == 201) {
-      print('successfully posted\n');
-    } else {
-      print('post protocol failed');
-    }
-    */
-
     try {
       print('response - 1');
       Response response = await dioInstance.post(
-          'http://localhost:4000/api/users/',
-          data: map,
+          'http://192.168.199.1:4000/api/users/',
+          data: temp_map,
           options: Options(responseType: ResponseType.json));
       print('response - 2');
 
       print(response.statusCode);
+      print(response.data);
+      Map<String, dynamic> map = response.data;
 
+      print(map['id']);
+      print(map['name']);
+      print(map['email']);
+      print(map['token']);
+
+      final sharedPreferences = SharedPrefsManager();
+      final SharedPreferences dbHandler = await sharedPreferences.prefs;
+
+      dbHandler.setString('name', map['name']);
+      dbHandler.setString('id', map['id']);
+      dbHandler.setString('email', map['email']);
+      dbHandler.setString('token', map['token']);
+
+      print('${dbHandler.getString('name')} - ${dbHandler.getString('token')}');
+      dbHandler.clear();
       if (response.statusCode! >= 200 && response.statusCode! <= 299) {
         return true;
       }
@@ -68,11 +59,22 @@ class DioService {
 
     try {
       Response response = await dioInstance.post(
-          'http://localhost:4000/api/users/login',
+          'http://192.168.199.1:4000/api/users/login',
           data: map,
           options: Options(responseType: ResponseType.json));
 
       if (response.statusCode! >= 200 && response.statusCode! <= 299) {
+        print(response.data);
+
+        final sharedPreferences = SharedPrefsManager();
+        final SharedPreferences dbHandler = await sharedPreferences.prefs;
+        Map<String, dynamic> tempMap = response.data;
+
+        dbHandler.setString('name', tempMap['name']);
+        dbHandler.setString('id', tempMap['id']);
+        dbHandler.setString('email', tempMap['email']);
+        dbHandler.setString('token', tempMap['token']);
+
         return true;
       } else {
         debugPrint('Error happened while login in try - block!');
@@ -99,7 +101,7 @@ class RegisterPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        title: Text('Authenticate'),
+        title: Text('Registration Protocol'),
       ),
       body: Container(
         child: Column(
@@ -147,8 +149,8 @@ class RegisterPage extends StatelessWidget {
                     final username = unameController.text;
                     final pass = passController.text;
                     final uemail = emailController.text;
-                    final sharedPreferences =
-                        SharedPreferenceEntity.getPreferenceDB();
+                    final sharedPreferences = SharedPrefsManager();
+                    final dbHandler = await sharedPreferences.prefs;
 
                     if (nullEmptyChecker(username) &&
                         nullEmptyChecker(pass) &&
@@ -158,16 +160,11 @@ class RegisterPage extends StatelessWidget {
                       print(result);
 
                       if (result) {
-                        /*
-                        await sharedPreferences.then((value) => null)//.setString('name', username);
-                        sharedPreferences.setString('email', uemail);
-                        sharedPreferences.setString('password', pass);
-                        */
-
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           content: Text('Posted Successfully'),
                           duration: Duration(seconds: 2),
                         ));
+                        Navigator.of(context).pushReplacementNamed('/home');
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           content: Text('Post Request Failed'),
@@ -183,6 +180,16 @@ class RegisterPage extends StatelessWidget {
                   },
                 ),
               ),
+            ),
+            Container(
+              child: TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pushReplacementNamed('/');
+                  },
+                  child: Text(
+                    'Login Page',
+                    style: TextStyle(color: Colors.green),
+                  )),
             )
           ],
         ),

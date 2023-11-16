@@ -175,7 +175,7 @@ class HomePageState extends ConsumerState<HomePage> {
   void dispose() {
     // TODO: implement dispose
     super.dispose();
-    // DatabaseRepository().closeDatabaseLayer();
+    DatabaseRepository().closeDatabaseLayer();
   }
 }
 
