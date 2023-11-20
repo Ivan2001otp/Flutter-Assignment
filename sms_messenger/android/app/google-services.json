@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1061184539105",
+    "project_id": "sms-messenger-aec43",
+    "storage_bucket": "sms-messenger-aec43.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1061184539105:android:c02d9d282f76208baf2aa0",
+        "android_client_info": {
+          "package_name": "com.example.sms_messenger"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA6_sG0tTNjeK2RarC78mSEUbTyW3rh_wc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
