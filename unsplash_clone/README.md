@@ -16,10 +16,6 @@ For help getting started with Flutter development, view the
 samples, guidance on mobile development, and a full API reference.
 
 ## Output video
-![GIF](https://github.com/Ivan2001otp/My-AppProjects-Flutter/blob/master/unsplash_clone_project/Photo_management_gif.gif)
-
-## Screenshot
-![](https://github.com/Ivan2001otp/My-AppProjects-Flutter/blob/master/unsplash_clone_project/unsplash.png)
-
+[![Click Here to see the output](https://img.youtube.com/vi/APUYCudsokU/0.jpg)](https://www.youtube.com/watch?v=APUYCudsokU)
 
 
